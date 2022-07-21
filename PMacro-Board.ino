@@ -11,25 +11,24 @@
 // Controls: x7 Mechanical Keys, x2 Rotary Encoders, x2 Buttons (on Encoders)
 
 // Import Dependencies
-#include <Mouse.h>
 #include <Keyboard.h>
 
 /////////////////////////////////////////////////////////////////
 // CHANGE THIS PART FOR CUSTOM COMMANDS //
-char BT_A_CMD = 'd'; // Leftmost 1U Key Command
-char BT_B_CMD = 'f'; // Middle left 1U Key Command
-char BT_C_CMD = 'j'; // Middle right 1U Key Command
-char BT_D_CMD = 'k'; // Rightmost 1U Key Command
+#define BT_A_CMD 'd' // Leftmost 1U Key Command
+#define BT_B_CMD 'f' // Middle left 1U Key Command
+#define BT_C_CMD 'j' // Middle right 1U Key Command
+#define BT_D_CMD 'k' // Rightmost 1U Key Command
 
-char FX_L_CMD = 'c';   // Bottom Left 2U Key Command
-char FX_R_CMD = 'm';   // Bottom Right 2U Key Command
+#define FX_L_CMD 'c'   // Bottom Left 2U Key Command
+#define FX_R_CMD 'm'   // Bottom Right 2U Key Command
 
-char BT_ST_CMD = 'y';  // Start Button Key Command
+#define BT_ST_CMD 'y'  // Start Button Key Command
 
-char ENC_LL_CMD = 'w'; // Left Encoder Left Turn Command
-char ENC_LR_CMD = 'e'; // Left Encoder Right Turn Command
-char ENC_RL_CMD = 'o'; // Right Encoder Left Turn Command
-char ENC_RR_CMD = 'p'; // Right Encoder Right Turn Command
+#define ENC_LL_CMD 'w' // Left Encoder Left Turn Command
+#define ENC_LR_CMD 'e' // Left Encoder Right Turn Command
+#define ENC_RL_CMD 'o' // Right Encoder Left Turn Command
+#define ENC_RR_CMD 'p' // Right Encoder Right Turn Command
 
 char ENC_BTNL_CMD = KEY_LEFT_ARROW;   // Left Encoder Button Command
 char ENC_BTNR_CMD = KEY_RIGHT_ARROW;  // Right Encoder Button Command
@@ -59,36 +58,34 @@ int8_t old_knob2 = 0;
 long timesincelastrot1 = 0;
 long timesincelastrot2 = 0;
 
+struct button{
+  int pin;
+  char key;
+} buttons[7];
+
 // Setup Function: Runs one time when the device powers on
 void setup()
 {
+  buttons[0] = {BT_A,  BT_A_CMD};
+  buttons[1] = {BT_B,  BT_B_CMD};
+  buttons[2] = {BT_C,  BT_D_CMD};
+  buttons[3] = {BT_D,  BT_D_CMD};
+  buttons[4] = {FX_L,  FX_L_CMD};
+  buttons[5] = {FX_R,  FX_R_CMD};
+  buttons[6] = {BT_ST,  BT_ST_CMD};
+
   // set pins to read, and output high
   // when the pins read low, we know that the buttons have been grounded (aka, pushed down)
   
-  // Set pins to INPUT mode, we want them to read data from the device
-  pinMode(BT_A, INPUT);
-  pinMode(BT_B, INPUT);
-  pinMode(BT_C, INPUT);
-  pinMode(BT_D, INPUT);
-  pinMode(FX_L, INPUT);
-  pinMode(FX_R, INPUT);
-  pinMode(BT_ST, INPUT);
-
+  // Set pins to INPUT mode with PULLUP to high, we want them to read key presses with a LOW read from the device
+  for (int i = 0; i < 7; i++)
+    pinMode(buttons[i].pin, INPUT_PULLUP);
+  
   // Set encoder button to INPUT mode, we want them to read data from the device
   pinMode(enc_btn_L, INPUT);
   pinMode(enc_btn_R, INPUT);
 
-  // Preset keys to HIGH, when keys are pressed will read LOW
-  digitalWrite(BT_A, HIGH);
-  digitalWrite(BT_B, HIGH);
-  digitalWrite(BT_C, HIGH);
-  digitalWrite(BT_D, HIGH);
-  digitalWrite(FX_L, HIGH);
-  digitalWrite(FX_R, HIGH);
-  digitalWrite(BT_ST, HIGH);
-
-  // Begin mouse and keyboard
-  Mouse.begin();
+  // Begin keyboard
   Keyboard.begin();
   Keyboard.releaseAll();
 }
@@ -105,68 +102,9 @@ void loop()
   // Read Button Presses
   // If button is HIGH, then it is NOT pressed
   // If button is LOW, then it IS pressed
-  if (digitalRead(BT_A) == LOW)
-  {
-    Keyboard.press(BT_A_CMD);
-  }
-  else
-  {
-    Keyboard.release(BT_A_CMD);
-  }
-
-  if (digitalRead(BT_B) == LOW)
-  {
-    Keyboard.press(BT_B_CMD);
-  }
-  else
-  {
-    Keyboard.release(BT_B_CMD);
-  }
-
-  if (digitalRead(BT_C) == LOW)
-  {
-    Keyboard.press(BT_C_CMD);
-  }
-  else
-  {
-    Keyboard.release(BT_C_CMD);
-  }
-
-  if (digitalRead(BT_D) == LOW)
-  {
-    Keyboard.press(BT_D_CMD);
-  }
-  else
-  {
-    Keyboard.release(BT_D_CMD);
-  }
-
-  if (digitalRead(FX_L) == LOW)
-  {
-    Keyboard.press(FX_L_CMD);
-  }
-  else
-  {
-    Keyboard.release(FX_L_CMD);
-  }
-
-  if (digitalRead(FX_R) == LOW)
-  {
-    Keyboard.press(FX_R_CMD);
-  }
-  else
-  {
-    Keyboard.release(FX_R_CMD);
-  }
-
-  if (digitalRead(BT_ST) == LOW)
-  {
-    Keyboard.press(BT_ST_CMD);
-  }
-  else
-  {
-    Keyboard.release(BT_ST_CMD);
-  }
+  for (int i = 0; i < 7; i++)
+    if (!digitalRead(buttons[i].pin))
+      Keyboard.press(buttons[i].key);
 
   if (digitalRead(enc_btn_L) == LOW)
   {
