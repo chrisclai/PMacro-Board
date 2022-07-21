@@ -72,7 +72,7 @@ void setup()
   buttons[3] = {BT_D,  BT_D_CMD};
   buttons[4] = {FX_L,  FX_L_CMD};
   buttons[5] = {FX_R,  FX_R_CMD};
-  buttons[6] = {BT_ST,  BT_ST_CMD};
+  buttons[6] = {BT_ST, BT_ST_CMD};
 
   // set pins to read, and output high
   // when the pins read low, we know that the buttons have been grounded (aka, pushed down)
@@ -102,9 +102,12 @@ void loop()
   // Read Button Presses
   // If button is HIGH, then it is NOT pressed
   // If button is LOW, then it IS pressed
-  for (int i = 0; i < 7; i++)
-    if (!digitalRead(buttons[i].pin))
+  for (int i = 0; i < 7; i++) {
+    if (digitalRead(buttons[i].pin))
+      Keyboard.release(buttons[i].key);
+    else
       Keyboard.press(buttons[i].key);
+  }
 
   if (digitalRead(enc_btn_L) == LOW)
   {
