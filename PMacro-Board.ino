@@ -11,6 +11,7 @@
 // Controls: x7 Mechanical Keys, x2 Rotary Encoders, x2 Buttons (on Encoders)
 
 // Import Dependencies
+#include <Arduino.h>
 #include <Keyboard.h>
 
 /////////////////////////////////////////////////////////////////
@@ -68,7 +69,7 @@ void setup()
 {
   buttons[0] = {BT_A,  BT_A_CMD};
   buttons[1] = {BT_B,  BT_B_CMD};
-  buttons[2] = {BT_C,  BT_D_CMD};
+  buttons[2] = {BT_C,  BT_C_CMD};
   buttons[3] = {BT_D,  BT_D_CMD};
   buttons[4] = {FX_L,  FX_L_CMD};
   buttons[5] = {FX_R,  FX_R_CMD};
@@ -105,6 +106,8 @@ void loop()
   for (int i = 0; i < 7; i++)
     if (!digitalRead(buttons[i].pin))
       Keyboard.press(buttons[i].key);
+    else
+      Keyboard.release(buttons[i].key);
 
   if (digitalRead(enc_btn_L) == LOW)
   {
